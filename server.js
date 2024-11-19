@@ -117,6 +117,15 @@ app.post("/api/house_plans", upload.single("img"), (req, res) => {
   console.log(house);
   res.status(200).send(house);
 });
+app.delete("/api/house_plans:id", (req,res) => {
+  const house = housePlan.find(housePlan=>housePlan._id ===parseInt(req.params.id)); 
+
+  if(!house) 
+  { 
+    res.status(404).send("The house with the provided id was not found"); 
+    return;
+  }
+}); 
 
 const validateHouse = (house) => {
   const schema = Joi.object({
