@@ -19,6 +19,7 @@ const upload = multer({ storage: storage });
 
 const housePlans = [
   {
+    _id: 1,
     name: "Farmhouse",
     size: 2000,
     bedrooms: 3,
@@ -37,6 +38,7 @@ const housePlans = [
     ],
   },
   {
+    _id: 2,
     name: "Mountain House",
     size: 1700,
     bedrooms: 3,
@@ -59,6 +61,7 @@ const housePlans = [
     ],
   },
   {
+    _id: 3,
     name: "Lake House",
     size: 3000,
     bedrooms: 4,
@@ -86,45 +89,44 @@ app.get("/api/house_plans", (req, res) => {
   res.json(housePlans);
 });
 
-app.post("/api/house_plans", upload.single("img"), (req,res) => {
+app.post("/api/house_plans", upload.single("img"), (req, res) => {
   console.log("In a post request");
 
-  const result = validateHouse(req.body); 
+  const result = validateHouse(req.body);
 
-  if (result.error){ 
-    res.status(400).send(result.error.details[0].message); 
-    console.log("I have an error"); 
-    return; 
+  if (result.error) {
+    res.status(400).send(result.error.details[0].message);
+    console.log("I have an error");
+    return;
   }
-  console.log("WOW"); 
 
-  const house = { 
+  const house = {
+    _id: housePlans.length + 1,
     name: req.body.name,
-    size: req.body.size, 
-    bedrooms: req.body.bedrooms, 
-    bathrooms: req.body.bathrooms, 
+    size: req.body.size,
+    bedrooms: req.body.bedrooms,
+    bathrooms: req.body.bathrooms,
+  };
+
+  if (req.file) {
+    house.main_image = req.file.filename;
   }
 
-  if (req.file){ 
-    house.main_image = req.file.filename; 
-  }
+  housePlans.push(house);
 
-  housePlans.push(house); 
-  console.log(house); 
-  res.status(200).send(house); 
-}); 
+  console.log(house);
+  res.status(200).send(house);
+});
 
-const validateHouse = (house) => { 
+const validateHouse = (house) => {
   const schema = Joi.object({
-    name:Joi.string().min(3).required(), 
-    size: Joi.number().required(), 
-    bathrooms: Joi.number().required(), 
-    bedrooms: Joi.number().required()
+    name: Joi.string().min(3).required(),
+    size: Joi.number().required(),
+    bedrooms: Joi.number().required(),
+    bathrooms: Joi.number().required(),
+  });
 
-    //make sure the names and case sensitive match// 
-  }); 
-
-  return schema.validate(house);  
+  return schema.validate(house);
 };
 
 app.listen(3001, () => {
